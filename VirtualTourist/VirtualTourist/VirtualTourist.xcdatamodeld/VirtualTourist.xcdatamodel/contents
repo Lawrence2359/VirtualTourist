@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10171" systemVersion="15E65" minimumToolsVersion="Automatic">
+    <entity name="FlickrAlbum" syncable="YES">
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="images" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlickrImage" inverseName="album" inverseEntity="FlickrImage" syncable="YES"/>
+    </entity>
+    <entity name="FlickrImage" syncable="YES">
+        <attribute name="farm" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="secret" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="server" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlickrAlbum" inverseName="images" inverseEntity="FlickrAlbum" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="FlickrImage" positionX="-54" positionY="-9" width="128" height="135"/>
+        <element name="FlickrAlbum" positionX="-36" positionY="9" width="128" height="90"/>
+    </elements>
+</model>
