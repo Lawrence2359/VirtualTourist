@@ -27,7 +27,7 @@
         <!--Virtual Tourist-->
         <scene sceneID="5bF-dP-Qzx">
             <objects>
-                <tableViewController id="kwP-HH-ehx" customClass="VPMapTableViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="VTMapTableViewController" id="kwP-HH-ehx" customClass="VTMapTableViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="284" sectionHeaderHeight="28" sectionFooterHeight="28" id="zas-hB-83C">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -88,13 +88,7 @@
                             <outlet property="delegate" destination="kwP-HH-ehx" id="biQ-Fm-hUL"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Virtual Tourist" id="Eqp-1i-xHd">
-                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="duA-ta-QMV">
-                            <connections>
-                                <action selector="onEdit:" destination="kwP-HH-ehx" id="v2L-Pf-Roo"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="Eqp-1i-xHd"/>
                     <connections>
                         <outlet property="mapCell" destination="Hcy-lH-hBu" id="h03-Le-R8J"/>
                         <outlet property="mapView" destination="Cm3-HG-tE6" id="l9U-BP-IpF"/>
@@ -104,6 +98,95 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ROc-YC-Nx4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="692" y="340"/>
+        </scene>
+        <!--Album Collection View Controller-->
+        <scene sceneID="HPC-gM-Rht">
+            <objects>
+                <collectionViewController storyboardIdentifier="VTAlbumCollectionViewController" id="Upt-ye-B5r" customClass="VTAlbumCollectionViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="GA2-6c-dOF">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qnT-Ot-KNd">
+                            <size key="itemSize" width="90" height="93"/>
+                            <size key="headerReferenceSize" width="50" height="114"/>
+                            <size key="footerReferenceSize" width="50" height="64"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="VTMapCollectionViewCell" id="BnG-df-PE6" customClass="VTMapCollectionViewCell" customModule="VirtualTourist" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="114" width="90" height="93"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="90" height="93"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xUi-Q3-JWa">
+                                            <rect key="frame" x="0.0" y="0.0" width="90" height="93"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <constraints>
+                                    <constraint firstItem="xUi-Q3-JWa" firstAttribute="top" secondItem="BnG-df-PE6" secondAttribute="topMargin" constant="-8" id="0uc-eJ-1iv"/>
+                                    <constraint firstItem="xUi-Q3-JWa" firstAttribute="leading" secondItem="BnG-df-PE6" secondAttribute="leadingMargin" constant="-8" id="Hfz-Vs-E7I"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="xUi-Q3-JWa" secondAttribute="bottom" constant="-8" id="VNM-eG-FxL"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="xUi-Q3-JWa" secondAttribute="trailing" constant="-8" id="YU2-Yp-BYi"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="imgView" destination="xUi-Q3-JWa" id="cb6-Us-tCz"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="VTCollectionHeaderView" id="1af-Yt-BJk" customClass="VTCollectionHeaderView" customModule="VirtualTourist" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="114"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <subviews>
+                                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="zhi-aF-T1y">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="114"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="Upt-ye-B5r" id="F0H-7a-fqT"/>
+                                    </connections>
+                                </mapView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="trailingMargin" secondItem="zhi-aF-T1y" secondAttribute="trailing" constant="-8" id="BVR-J8-Inb"/>
+                                <constraint firstItem="zhi-aF-T1y" firstAttribute="leading" secondItem="1af-Yt-BJk" secondAttribute="leadingMargin" constant="-8" id="COc-WB-KcA"/>
+                                <constraint firstAttribute="bottomMargin" secondItem="zhi-aF-T1y" secondAttribute="bottom" constant="-8" id="dIk-90-sR4"/>
+                                <constraint firstItem="zhi-aF-T1y" firstAttribute="top" secondItem="1af-Yt-BJk" secondAttribute="topMargin" constant="-8" id="x8U-U6-nvN"/>
+                            </constraints>
+                            <connections>
+                                <outlet property="mapView" destination="zhi-aF-T1y" id="aay-QK-pOV"/>
+                            </connections>
+                        </collectionReusableView>
+                        <collectionReusableView key="sectionFooterView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="VTCollectionFooterView" id="wuN-PW-gb3" customClass="VTCollectionFooterView" customModule="VirtualTourist" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="207" width="320" height="64"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Collection" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E34-gu-5Wr">
+                                    <rect key="frame" x="8" y="8" width="304" height="48"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <color key="textColor" red="0.0" green="0.6705882353" blue="0.85098039219999999" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="E34-gu-5Wr" firstAttribute="trailing" secondItem="wuN-PW-gb3" secondAttribute="trailingMargin" id="9rT-BP-eaM"/>
+                                <constraint firstItem="E34-gu-5Wr" firstAttribute="top" secondItem="wuN-PW-gb3" secondAttribute="topMargin" id="M3k-8s-HcU"/>
+                                <constraint firstItem="E34-gu-5Wr" firstAttribute="bottom" secondItem="wuN-PW-gb3" secondAttribute="bottomMargin" id="UEd-FR-nVo"/>
+                                <constraint firstItem="E34-gu-5Wr" firstAttribute="leading" secondItem="wuN-PW-gb3" secondAttribute="leadingMargin" id="cqt-iI-JRQ"/>
+                            </constraints>
+                        </collectionReusableView>
+                        <connections>
+                            <outlet property="dataSource" destination="Upt-ye-B5r" id="Bve-pP-6W8"/>
+                            <outlet property="delegate" destination="Upt-ye-B5r" id="aeY-4s-J7h"/>
+                        </connections>
+                    </collectionView>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iTR-l4-5nK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1069" y="340"/>
         </scene>
     </scenes>
 </document>

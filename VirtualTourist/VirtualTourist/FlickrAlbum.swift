@@ -14,10 +14,12 @@ class FlickrAlbum : NSManagedObject {
     struct Keys {
         static let Latitude = "latitude"
         static let Longitude = "longitude"
+        static let Name = "name"
     }
     
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
+    @NSManaged var name: String
     @NSManaged var images: [FlickrImage]
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -30,6 +32,7 @@ class FlickrAlbum : NSManagedObject {
         super.init(entity: entity,insertIntoManagedObjectContext: context)
         latitude = dictionary[Keys.Latitude] as! NSNumber
         longitude = dictionary[Keys.Longitude] as! NSNumber
+        name = dictionary[Keys.Name] as! String
         
     }
     

@@ -17,7 +17,7 @@ extension FlickrClient {
     func getPhotosFromLocation(latitude: Double, longtitude: Double, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
         
         /* 1. Specify parameters, method (if has {key}), and HTTP body (if POST) */
-        let parameters = ["api_key": Constants.ApplicationKey, "lat": latitude, "lon": longtitude, "format": "json", "nojsoncallback": 1, "per_page": 10]
+        let parameters = ["api_key": Constants.ApplicationKey, "lat": latitude, "lon": longtitude, "format": "json", "nojsoncallback": 1]
         let mutableMethod : String = Methods.SearchPhotos
             
         
@@ -37,5 +37,27 @@ extension FlickrClient {
             }
         }
     }
+    
+    // MARK: - All purpose task method for images
+    
+    func taskForImageWithSize(filePath: String, completionHandler: (imageData: NSData?, error: NSError?) ->  Void) -> NSURLSessionTask {
+        
+        let url = NSURL(string: filePath)!
+        let request = NSURLRequest(URL: url)
+        
+        let task = session.dataTaskWithRequest(request) {data, response, downloadError in
+            
+            if let error = downloadError {
+                completionHandler(imageData: nil, error: NSError(domain: "Image Download Error", code: 1, userInfo: nil))
+            } else {
+                completionHandler(imageData: data, error: nil)
+            }
+        }
+        
+        task.resume()
+        
+        return task
+    }
+    
 
 }

@@ -18,11 +18,11 @@ class FlickrImage : NSManagedObject {
         static let Server = "server"
     }
     
-    @NSManaged var farm: String?
-    @NSManaged var photoID: String?
-    @NSManaged var secret: String?
-    @NSManaged var server: String?
-    @NSManaged var image_url: String?
+    @NSManaged var farm: NSNumber!
+    @NSManaged var photoID: String!
+    @NSManaged var secret: String!
+    @NSManaged var server: String!
+    @NSManaged var imagePath: String!
     @NSManaged var album: FlickrAlbum?
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -36,26 +36,25 @@ class FlickrImage : NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
         // Dictionary
-        farm = dictionary[Keys.Farm] as? String ?? "1"
+        farm = dictionary[Keys.Farm] as? NSNumber ?? 1
         photoID = dictionary[Keys.ID] as? String ?? ""
         secret = dictionary[Keys.Secret] as? String ?? ""
         server = dictionary[Keys.Server] as? String ?? ""
-        image_url = ""
-        //image_url = flickrImageURL(farm, photoID: photoID, secret: secret, server: server)
+        imagePath = flickrImageURL()
     }
-    
-    func flickrImageURL(farm: String?, photoID: String?, secret: String?, server: String?) -> String {
-        return "http://farm\(farm).staticflickr.com/\(server)/\(photoID)_\(secret)_m.jpg"
+
+    func flickrImageURL(size:String = "m") -> String {
+        return "http://farm\(farm!).staticflickr.com/\(server!)/\(photoID!)_\(secret!)_m.jpg"
     }
     
     var photoImage: UIImage? {
         
         get {
-            return FlickrClient.Caches.imageCache.imageWithIdentifier(image_url)
+            return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath)
         }
         
         set {
-            FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: image_url!)
+            FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!)
         }
     }
     
