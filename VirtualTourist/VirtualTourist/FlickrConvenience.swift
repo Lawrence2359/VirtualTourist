@@ -16,8 +16,10 @@ extension FlickrClient {
     
     func getPhotosFromLocation(latitude: Double, longtitude: Double, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
         
+        let randomPage = Int(arc4random_uniform(UInt32(10)))
+        
         /* 1. Specify parameters, method (if has {key}), and HTTP body (if POST) */
-        let parameters = ["api_key": Constants.ApplicationKey, "lat": latitude, "lon": longtitude, "format": "json", "nojsoncallback": 1]
+        let parameters = ["api_key": Constants.ApplicationKey, "lat": latitude, "lon": longtitude, "format": "json", "nojsoncallback": 1, "page": randomPage]
         let mutableMethod : String = Methods.SearchPhotos
             
         

@@ -15,7 +15,6 @@
 		CAEF83D81CD3195A009E85C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CAEF83D61CD3195A009E85C7 /* Main.storyboard */; };
 		CAEF83DB1CD3195A009E85C7 /* VirtualTourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CAEF83D91CD3195A009E85C7 /* VirtualTourist.xcdatamodeld */; };
 		CAEF83DD1CD3195A009E85C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAEF83DC1CD3195A009E85C7 /* Assets.xcassets */; };
-		CAEF83E01CD3195A009E85C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CAEF83DE1CD3195A009E85C7 /* LaunchScreen.storyboard */; };
 		CAEF83E81CD31B13009E85C7 /* VTMapTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAEF83E71CD31B13009E85C7 /* VTMapTableViewController.swift */; };
 		CAEF83EE1CD3214E009E85C7 /* VTMapSettingsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAEF83ED1CD3214E009E85C7 /* VTMapSettingsHelper.swift */; };
 		CAEF83F11CD335D3009E85C7 /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAEF83F01CD335D3009E85C7 /* FlickrConstants.swift */; };
@@ -37,7 +36,6 @@
 		CAEF83D71CD3195A009E85C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CAEF83DA1CD3195A009E85C7 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
 		CAEF83DC1CD3195A009E85C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CAEF83DF1CD3195A009E85C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CAEF83E11CD3195A009E85C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CAEF83E71CD31B13009E85C7 /* VTMapTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTMapTableViewController.swift; sourceTree = "<group>"; };
 		CAEF83ED1CD3214E009E85C7 /* VTMapSettingsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VTMapSettingsHelper.swift; sourceTree = "<group>"; };
@@ -105,7 +103,6 @@
 				CAEF84031CD368B3009E85C7 /* Controllers */,
 				CAEF83D61CD3195A009E85C7 /* Main.storyboard */,
 				CAEF83DC1CD3195A009E85C7 /* Assets.xcassets */,
-				CAEF83DE1CD3195A009E85C7 /* LaunchScreen.storyboard */,
 				CAEF83E11CD3195A009E85C7 /* Info.plist */,
 				CAEF83D91CD3195A009E85C7 /* VirtualTourist.xcdatamodeld */,
 			);
@@ -183,6 +180,7 @@
 				TargetAttributes = {
 					CAEF83CE1CD3195A009E85C7 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 5U4MH93EC9;
 					};
 				};
 			};
@@ -209,7 +207,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CAEF83E01CD3195A009E85C7 /* LaunchScreen.storyboard in Resources */,
 				CAEF83DD1CD3195A009E85C7 /* Assets.xcassets in Resources */,
 				CAEF83D81CD3195A009E85C7 /* Main.storyboard in Resources */,
 			);
@@ -249,14 +246,6 @@
 				CAEF83D71CD3195A009E85C7 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		CAEF83DE1CD3195A009E85C7 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CAEF83DF1CD3195A009E85C7 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -349,10 +338,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = VirtualTourist/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.law.VirtualTourist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -360,10 +354,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = VirtualTourist/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.law.VirtualTourist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
