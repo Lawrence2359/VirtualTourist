@@ -63,14 +63,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		CA2617961CD79492008263CB /* Custom Views */ = {
+		CA2617961CD79492008263CB /* Custom Subviews */ = {
 			isa = PBXGroup;
 			children = (
 				CA26178E1CD758FB008263CB /* VTMapCollectionViewCell.swift */,
 				CA2617901CD75A4A008263CB /* VTCollectionHeaderView.swift */,
 				CA2617921CD75A56008263CB /* VTCollectionFooterView.swift */,
 			);
-			name = "Custom Views";
+			name = "Custom Subviews";
+			sourceTree = "<group>";
+		};
+		CA94EFC11CD889C800E7E4AF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CAEF83E71CD31B13009E85C7 /* VTMapTableViewController.swift */,
+				CA26178C1CD75832008263CB /* VTAlbumCollectionViewController.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		CAEF83C61CD3195A009E85C7 = {
@@ -108,8 +117,8 @@
 		CAEF83EF1CD32152009E85C7 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
-				CAEF83F21CD335D9009E85C7 /* Flickr */,
 				CAEF83ED1CD3214E009E85C7 /* VTMapSettingsHelper.swift */,
+				CAEF83F21CD335D9009E85C7 /* Flickr */,
 			);
 			name = Helper;
 			sourceTree = "<group>";
@@ -121,6 +130,7 @@
 				CAEF83F31CD335F0009E85C7 /* FlickrClient.swift */,
 				CAEF83F01CD335D3009E85C7 /* FlickrConstants.swift */,
 				CAEF83F51CD33DC6009E85C7 /* FlickrConvenience.swift */,
+				CAEF83FD1CD35C8B009E85C7 /* FlickrImageCache.swift */,
 			);
 			name = Flickr;
 			sourceTree = "<group>";
@@ -131,7 +141,6 @@
 				CAEF83FF1CD35E04009E85C7 /* FlickrAlbum.swift */,
 				CA94EFBF1CD8605900E7E4AF /* FlickrAlbumPin.swift */,
 				CAEF83FB1CD359B9009E85C7 /* FlickrImage.swift */,
-				CAEF83FD1CD35C8B009E85C7 /* FlickrImageCache.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -139,9 +148,8 @@
 		CAEF84031CD368B3009E85C7 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				CA2617961CD79492008263CB /* Custom Views */,
-				CAEF83E71CD31B13009E85C7 /* VTMapTableViewController.swift */,
-				CA26178C1CD75832008263CB /* VTAlbumCollectionViewController.swift */,
+				CA94EFC11CD889C800E7E4AF /* Views */,
+				CA2617961CD79492008263CB /* Custom Subviews */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
