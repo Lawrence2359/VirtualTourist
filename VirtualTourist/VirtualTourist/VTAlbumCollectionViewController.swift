@@ -123,12 +123,9 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         for image in addToList {
             self.sharedContext.deleteObject(image)
         }
-        if let collectionView = collectionView {
-            collectionView.reloadItemsAtIndexPaths(indexPathsList)
-        }
-        indexPathsList.removeAll()
-        addToList.removeAll()
-        //loadPhotos()
+        album = getAlbum()
+        images = (album?.images)!
+        loadPhotos()
     }
     
     func onBack() {
@@ -340,13 +337,10 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             
         }else{
             
-            let results = albumsFetchedResultsController.fetchedObjects
-            if results != nil && results?.count > 0 {
-                self.images = getRandomObjectsFromFetchedResults()
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.collectionView?.reloadData()
-                })
-            }
+            self.images = getRandomObjectsFromFetchedResults()
+            dispatch_async(dispatch_get_main_queue(), {
+                self.collectionView?.reloadData()
+            })
             
         }
         
