@@ -165,6 +165,7 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("VTAlbumCollectionViewController") as! VTAlbumCollectionViewController
             vc.centerCoordinate = CLLocationCoordinate2D(latitude: Double(view.annotation!.coordinate.latitude), longitude: Double(view.annotation!.coordinate.longitude))
             self.navigationController?.pushViewController(vc, animated: true)
+            mapView.deselectAnnotation(view.annotation, animated: false)
         
         }else{
             

@@ -14,6 +14,8 @@ private let reuseIdentifier = "VTMapCollectionViewCell"
 
 class VTAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, NSFetchedResultsControllerDelegate {
     
+    var emptyLabel: UILabel?
+    
     let kHeightOfButton: CGFloat = 66.0
     var albumName: String?
     
@@ -56,6 +58,14 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         
         activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
         activityView!.center = view.center
+        
+        emptyLabel = UILabel(frame: CGRectMake(0,0, UIScreen.mainScreen().bounds.size.width, 44))
+        emptyLabel?.textAlignment = .Center
+        emptyLabel?.center = view.center
+        emptyLabel?.text = "No photos found :("
+        emptyLabel?.textColor = UIColor.blackColor()
+        emptyLabel?.hidden = true
+        view.addSubview(emptyLabel!)
         
         newCollectionBtn = UIButton(frame: CGRectMake(0, UIScreen.mainScreen().bounds.size.height-kHeightOfButton, UIScreen.mainScreen().bounds.size.width, kHeightOfButton))
         newCollectionBtn?.setTitle("New Collection", forState: .Normal)
@@ -346,6 +356,16 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             if result != nil {
                 
                 if let photos = result![FlickrClient.JSONResponseKeys.Photos]![FlickrClient.JSONResponseKeys.Photo] as? NSArray {
+                    
+                    if photos.count == 0 {
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.emptyLabel?.hidden = false
+                        })
+                    }else{
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.emptyLabel?.hidden = true
+                        })
+                    }
                     
                     self.sharedContext.performBlockAndWait({
                         
