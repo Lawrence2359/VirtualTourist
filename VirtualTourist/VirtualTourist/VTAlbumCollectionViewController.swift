@@ -42,21 +42,6 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
-    lazy var albumsFetchedResultsController: NSFetchedResultsController = {
-        
-        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
-        
-        let albumName = String(format: "%.6fN%.6f", self.centerCoordinate!.latitude, self.centerCoordinate!.longitude)
-        
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "name = %@", albumName)
-        
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        return fetchedResultsController
-        
-    }()
-    
     override func viewDidLoad() {
         let backBarBtn = UIBarButtonItem(title: "Ok", style: .Plain, target: self, action: #selector(VTAlbumCollectionViewController.onBack))
         
@@ -149,7 +134,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let currItem = images[indexPath.row]
         if currItem.selected == 0 {
-            addToList.append(images[indexPath.row])
+            addToList.append(currItem)
             if addToList.count == 0 {
                 deleteBtn?.hidden = true
             }else{
@@ -157,7 +142,6 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             }
             currItem.selected = 1
             indexPathsList.append(indexPath)
-            self.saveContext()
         }else{
             let imageObj = images[indexPath.row]
             let idxOfObj = addToList.indexOf(imageObj)
@@ -169,7 +153,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             }
             currItem.selected = 0
         }
-        
+        self.saveContext()
         collectionView.reloadData()
     }
     
@@ -357,7 +341,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             max = 21
         }else{
             remaining = results.count
-            max = results.count
+            max = results.count - 1
         }
         
         if results.count < remaining {return results}
