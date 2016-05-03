@@ -618,11 +618,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "188"
-            endingLineNumber = "188"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
             landmarkName = "collectionView(_:cellForItemAtIndexPath:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -634,11 +634,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "190"
-            endingLineNumber = "190"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
             landmarkName = "collectionView(_:cellForItemAtIndexPath:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -650,11 +650,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
+            startingLineNumber = "229"
+            endingLineNumber = "229"
             landmarkName = "collectionView(_:cellForItemAtIndexPath:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -778,11 +778,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483950941.563804"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "131"
-            endingLineNumber = "131"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "collectionView(_:didSelectItemAtIndexPath:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -890,12 +890,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "330"
-            endingLineNumber = "330"
-            landmarkName = "getRandomObjectsFromFetchedResults(_:)"
+            startingLineNumber = "360"
+            endingLineNumber = "360"
+            landmarkName = "getRandomObjectsFromFetchedResults()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -906,12 +906,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "331"
-            endingLineNumber = "331"
-            landmarkName = "getRandomObjectsFromFetchedResults(_:)"
+            startingLineNumber = "361"
+            endingLineNumber = "361"
+            landmarkName = "getRandomObjectsFromFetchedResults()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -922,12 +922,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "341"
-            endingLineNumber = "341"
-            landmarkName = "getRandomObjectsFromFetchedResults(_:)"
+            startingLineNumber = "371"
+            endingLineNumber = "371"
+            landmarkName = "getRandomObjectsFromFetchedResults()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -938,12 +938,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "344"
-            endingLineNumber = "344"
-            landmarkName = "getRandomObjectsFromFetchedResults(_:)"
+            startingLineNumber = "374"
+            endingLineNumber = "374"
+            landmarkName = "getRandomObjectsFromFetchedResults()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -954,12 +954,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "351"
-            endingLineNumber = "351"
-            landmarkName = "getRandomObjectsFromFetchedResults(_:)"
+            startingLineNumber = "381"
+            endingLineNumber = "381"
+            landmarkName = "getRandomObjectsFromFetchedResults()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -970,11 +970,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483951192.974283"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "316"
-            endingLineNumber = "316"
+            startingLineNumber = "346"
+            endingLineNumber = "346"
             landmarkName = "loadPhotos()"
             landmarkType = "5">
             <Locations>
@@ -1018,11 +1018,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
-            timestampString = "483950919.588602"
+            timestampString = "483958534.541795"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "94"
-            endingLineNumber = "94"
+            startingLineNumber = "124"
+            endingLineNumber = "124"
             landmarkName = "onDelete()"
             landmarkType = "5">
          </BreakpointContent>
@@ -1184,6 +1184,70 @@
             startingLineNumber = "265"
             endingLineNumber = "265"
             landmarkName = "addAnnotation(_:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
+            timestampString = "483958534.541795"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
+            landmarkName = "viewWillAppear(_:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
+            timestampString = "483958534.541795"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "336"
+            endingLineNumber = "336"
+            landmarkName = "loadPhotos()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
+            timestampString = "483958534.541795"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "339"
+            endingLineNumber = "339"
+            landmarkName = "loadPhotos()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "VirtualTourist/VTAlbumCollectionViewController.swift"
+            timestampString = "483958402.62215"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "viewDidLoad()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

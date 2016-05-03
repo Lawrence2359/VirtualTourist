@@ -15,10 +15,12 @@ private let reuseIdentifier = "VTMapCollectionViewCell"
 class VTAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, NSFetchedResultsControllerDelegate {
     
     let kHeightOfButton: CGFloat = 66.0
+    var albumName: String?
     
     var centerCoordinate: CLLocationCoordinate2D?
     var images = [FlickrImage]()
     var addToList = [FlickrImage]()
+    var indexPathsList = [NSIndexPath]()
     
     var overlay: UIView?
     var activityView: UIActivityIndicatorView?
@@ -27,6 +29,8 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     var deleteBtn: UIButton?
     
     let flickrAgent = FlickrClient.sharedInstance()
+    
+    var album: FlickrAlbum?
     
     // MARK: - Core Data Convenience
     
@@ -59,6 +63,8 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         self.navigationItem.hidesBackButton = true
         self.navigationItem.leftBarButtonItem = backBarBtn
         
+        albumName = String(format: "%.6fN%.6f", self.centerCoordinate!.latitude, self.centerCoordinate!.longitude)
+        
         overlay = UIView(frame: view.frame)
         overlay!.backgroundColor = UIColor.blackColor()
         overlay!.alpha = 0.3
@@ -78,6 +84,30 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         deleteBtn?.addTarget(self, action: #selector(VTAlbumCollectionViewController.onDelete), forControlEvents: .TouchUpInside)
         deleteBtn?.hidden = true
         view.addSubview(deleteBtn!)
+        
+        album = getAlbum()
+        images = (album?.images)!
+    }
+    
+    func getAlbum() -> FlickrAlbum {
+        
+        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "name = %@", self.albumName!)
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {}
+        
+        fetchedResultsController.delegate = self
+        
+        let album = fetchedResultsController.fetchedObjects?.first as? FlickrAlbum
+        
+        return album!
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -93,7 +123,12 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         for image in addToList {
             self.sharedContext.deleteObject(image)
         }
-        loadPhotos()
+        if let collectionView = collectionView {
+            collectionView.reloadItemsAtIndexPaths(indexPathsList)
+        }
+        indexPathsList.removeAll()
+        addToList.removeAll()
+        //loadPhotos()
     }
     
     func onBack() {
@@ -124,6 +159,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                 deleteBtn?.hidden = false
             }
             currItem.selected = 1
+            indexPathsList.append(indexPath)
             self.saveContext()
         }else{
             let imageObj = images[indexPath.row]
@@ -136,6 +172,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             }
             currItem.selected = 0
         }
+        
         collectionView.reloadData()
     }
     
@@ -297,13 +334,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     
     func loadPhotos() {
         
-        do {
-            try albumsFetchedResultsController.performFetch()
-        } catch {}
-        
-        albumsFetchedResultsController.delegate = self
-        
-        if albumsFetchedResultsController.fetchedObjects?.count == 0 {
+        if images.count == 0 {
         
             loadPhotosFromFlickr()
             
@@ -311,8 +342,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             
             let results = albumsFetchedResultsController.fetchedObjects
             if results != nil && results?.count > 0 {
-                let album = results![0] as! FlickrAlbum
-                self.images = getRandomObjectsFromFetchedResults(album)
+                self.images = getRandomObjectsFromFetchedResults()
                 dispatch_async(dispatch_get_main_queue(), {
                     self.collectionView?.reloadData()
                 })
@@ -322,9 +352,9 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         
     }
     
-    func getRandomObjectsFromFetchedResults(album :FlickrAlbum) -> [FlickrImage] {
+    func getRandomObjectsFromFetchedResults() -> [FlickrImage] {
         
-        let results = album.images
+        let results = album!.images
         let tempArray = NSMutableArray()
         var remaining = 0
         var max = 0
@@ -375,10 +405,6 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             
             if result != nil {
                 
-                let albumName = String(format: "%.6fN%.6f", self.centerCoordinate!.latitude, self.centerCoordinate!.longitude)
-                
-                let currPhotoAlbum = FlickrAlbum(dictionary: ["latitude": self.centerCoordinate!.latitude, "longitude": self.centerCoordinate!.longitude, "name": albumName], context: self.sharedContext)
-                
                 if let photos = result![FlickrClient.JSONResponseKeys.Photos]![FlickrClient.JSONResponseKeys.Photo] as? NSArray {
                     
                     for photo in photos {
@@ -386,7 +412,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                         let _ = currPhoto.map() { (dictionary: [String : AnyObject]) -> FlickrImage in
                             let currPhotoItem = FlickrImage(dictionary: dictionary, context: self.sharedContext)
                             
-                            currPhotoItem.album = currPhotoAlbum
+                            currPhotoItem.album = self.album
                             
                             return currPhotoItem
                         }
@@ -396,28 +422,12 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                         self.stopLoading()
                     })
                     
-                    let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
-                    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-                    fetchRequest.predicate = NSPredicate(format: "name = %@", albumName)
                     
-                    let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-                        managedObjectContext: self.sharedContext,
-                        sectionNameKeyPath: nil,
-                        cacheName: nil)
-                    do {
-                        try fetchedResultsController.performFetch()
-                    } catch {}
-                    
-                    
-                    let results = fetchedResultsController.fetchedObjects
-                    if results != nil && results?.count > 0 {
-                        let album = results![0] as! FlickrAlbum
-                        self.images = self.getRandomObjectsFromFetchedResults(album)
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.stopLoading()
-                            self.collectionView?.reloadData()
-                        })
-                    }
+                    self.images = self.getRandomObjectsFromFetchedResults()
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.stopLoading()
+                        self.collectionView?.reloadData()
+                    })
                     
                 } else {
                     dispatch_async(dispatch_get_main_queue(), {

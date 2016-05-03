@@ -82,7 +82,7 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         
             for pin in albumPins! {
                 
-                let pinData = pin as! FlickrAlbumPin
+                let pinData = pin as! FlickrAlbum
                 let annotationCoordinate = CLLocationCoordinate2DMake(Double(pinData.latitude), Double(pinData.longitude))
                 let dropPin = MKPointAnnotation()
                 dropPin.coordinate = annotationCoordinate
@@ -164,13 +164,13 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             
             let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("VTAlbumCollectionViewController") as! VTAlbumCollectionViewController
             vc.centerCoordinate = CLLocationCoordinate2D(latitude: Double(view.annotation!.coordinate.latitude), longitude: Double(view.annotation!.coordinate.longitude))
-                self.navigationController?.pushViewController(vc, animated: true)
+            self.navigationController?.pushViewController(vc, animated: true)
         
         }else{
             
             let name = String(format: "%.6fN%.6f", (view.annotation?.coordinate.latitude)!, (view.annotation?.coordinate.longitude)!)
             
-            let fetchRequest = NSFetchRequest(entityName: "FlickrAlbumPin")
+            let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
             
             fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
             fetchRequest.predicate = NSPredicate(format: "name = %@", name)
@@ -183,7 +183,7 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             
             fetchedResultsController.delegate = self
             
-            if let albumPin = fetchedResultsController.fetchedObjects?.first as?FlickrAlbumPin
+            if let albumPin = fetchedResultsController.fetchedObjects?.first as?FlickrAlbum
             {
                 sharedContext.deleteObject(albumPin)
                 CoreDataStackManager.sharedInstance().saveContext()
@@ -256,12 +256,12 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             let name = String(format: "%.6fN%.6f", annotation.coordinate.latitude, annotation.coordinate.longitude)
             
             let dictionary: [String : AnyObject] = [
-                FlickrAlbumPin.Keys.Latitude : annotation.coordinate.latitude,
-                FlickrAlbumPin.Keys.Longitude : annotation.coordinate.longitude,
-                FlickrAlbumPin.Keys.Name : name
+                FlickrAlbum.Keys.Latitude : annotation.coordinate.latitude,
+                FlickrAlbum.Keys.Longitude : annotation.coordinate.longitude,
+                FlickrAlbum.Keys.Name : name
             ]
             
-            _ = FlickrAlbumPin(dictionary: dictionary, context: sharedContext)
+            _ = FlickrAlbum(dictionary: dictionary, context: sharedContext)
             
             self.saveContext()
         }
@@ -269,7 +269,7 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
     
     lazy var albumPinsFetchedResultsController: NSFetchedResultsController = {
         
-        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbumPin")
+        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
         
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         

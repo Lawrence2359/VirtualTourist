@@ -52,7 +52,7 @@ class FlickrImage : NSManagedObject {
     }
     
     func filePathURL() -> String {
-        return "\(photoID!)\(secret!).jpg"
+        return "\(photoID!).jpg"
     }
     
     var photoImage: UIImage? {
