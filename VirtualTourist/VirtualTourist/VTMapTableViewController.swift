@@ -26,9 +26,6 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
     let mapSettingsHelper = VTMapSettingsHelper.sharedInstance()
     let flickrAgent = FlickrClient.sharedInstance()
     
-    var overlay: UIView?
-    var activityView: UIActivityIndicatorView?
-    
     var currentPinLatitude: NSNumber = 0.0
     var currentPinLongitude: NSNumber = 0.0
     
@@ -51,13 +48,6 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: kMapCell)
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: kTapCell)
         tableView.rowHeight = UITableViewAutomaticDimension
-        
-        overlay = UIView(frame: view.frame)
-        overlay!.backgroundColor = UIColor.blackColor()
-        overlay!.alpha = 0.3
-        
-        activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
-        activityView!.center = mapView.center
         
         arrayOfCells.append(mapCell)
         tableView.reloadData()
@@ -178,16 +168,26 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         
         }else{
             
-            do {
-                try albumPinsFetchedResultsController.performFetch()
-            } catch {}
+            let name = String(format: "%.6fN%.6f", (view.annotation?.coordinate.latitude)!, (view.annotation?.coordinate.longitude)!)
             
             let fetchRequest = NSFetchRequest(entityName: "FlickrAlbumPin")
-            let name = String(format: "%.6fN%.6f", (view.annotation?.coordinate.latitude)!, (view.annotation?.coordinate.longitude)!)
+            
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
             fetchRequest.predicate = NSPredicate(format: "name = %@", name)
-            let albumPin = albumPinsFetchedResultsController.fetchedObjects?.first as! FlickrAlbumPin
-            sharedContext.deleteObject(albumPin)
-            CoreDataStackManager.sharedInstance().saveContext()
+            
+            let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+            
+            do {
+                try fetchedResultsController.performFetch()
+            } catch {}
+            
+            fetchedResultsController.delegate = self
+            
+            if let albumPin = fetchedResultsController.fetchedObjects?.first as?FlickrAlbumPin
+            {
+                sharedContext.deleteObject(albumPin)
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
             
             do {
                 try albumPinsFetchedResultsController.performFetch()
@@ -219,15 +219,6 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
                 continue;
             }
             
-            
-            let dictionary: [String : AnyObject] = [
-                FlickrAlbumPin.Keys.Latitude : mkView.annotation!.coordinate.latitude,
-                FlickrAlbumPin.Keys.Longitude : mkView.annotation!.coordinate.longitude
-            ]
-            
-            _ = FlickrAlbumPin(dictionary: dictionary, context: sharedContext)
-        
-            self.saveContext()
             
             let endFrame:CGRect = mkView.frame;
             
@@ -261,21 +252,19 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             mapView.addAnnotation(annotation)
+            
+            let name = String(format: "%.6fN%.6f", annotation.coordinate.latitude, annotation.coordinate.longitude)
+            
+            let dictionary: [String : AnyObject] = [
+                FlickrAlbumPin.Keys.Latitude : annotation.coordinate.latitude,
+                FlickrAlbumPin.Keys.Longitude : annotation.coordinate.longitude,
+                FlickrAlbumPin.Keys.Name : name
+            ]
+            
+            _ = FlickrAlbumPin(dictionary: dictionary, context: sharedContext)
+            
+            self.saveContext()
         }
-    }
-    
-    // MARK: Loading View
-    
-    func showLoading() {
-        mapView.addSubview(overlay!)
-        mapView.addSubview(activityView!)
-        activityView?.startAnimating()
-    }
-    
-    func stopLoading() {
-        activityView?.stopAnimating()
-        overlay?.removeFromSuperview()
-        activityView?.removeFromSuperview()
     }
     
     lazy var albumPinsFetchedResultsController: NSFetchedResultsController = {

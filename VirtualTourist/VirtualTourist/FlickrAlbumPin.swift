@@ -14,6 +14,7 @@ class FlickrAlbumPin : NSManagedObject {
     struct Keys {
         static let Latitude = "latitude"
         static let Longitude = "longitude"
+        static let Name = "name"
     }
     
     @NSManaged var latitude: NSNumber
@@ -30,7 +31,8 @@ class FlickrAlbumPin : NSManagedObject {
         super.init(entity: entity,insertIntoManagedObjectContext: context)
         latitude = dictionary[Keys.Latitude] as! NSNumber
         longitude = dictionary[Keys.Longitude] as! NSNumber
-        name = String(format: "%.6fN%.6f", latitude, longitude)
+        name = dictionary[Keys.Name] as! String
+        
     }
     
 
