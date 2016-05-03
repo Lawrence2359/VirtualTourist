@@ -23,7 +23,9 @@ class FlickrImage : NSManagedObject {
     @NSManaged var secret: String!
     @NSManaged var server: String!
     @NSManaged var imagePath: String!
+    @NSManaged var filePath: String!
     @NSManaged var album: FlickrAlbum?
+    @NSManaged var selected: NSNumber!
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -41,20 +43,27 @@ class FlickrImage : NSManagedObject {
         secret = dictionary[Keys.Secret] as? String ?? ""
         server = dictionary[Keys.Server] as? String ?? ""
         imagePath = flickrImageURL()
+        filePath = filePathURL()
+        selected = 0
     }
 
     func flickrImageURL(size:String = "m") -> String {
         return "http://farm\(farm!).staticflickr.com/\(server!)/\(photoID!)_\(secret!)_m.jpg"
     }
     
+    func filePathURL() -> String {
+        return "/farm\(farm!)staticflickrcom/\(server!)/\(photoID!)\(secret!).jpg"
+    }
+    
     var photoImage: UIImage? {
         
+        
         get {
-            return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath)
+            return FlickrClient.Caches.imageCache.imageWithIdentifier(filePath)
         }
         
         set {
-            FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!)
+            FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: filePath!)
         }
     }
     

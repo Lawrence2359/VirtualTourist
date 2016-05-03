@@ -70,14 +70,14 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(MKMapView.addAnnotation(_:)))
         longPress.delegate = self
-        longPress.minimumPressDuration = 1.0
+        longPress.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(longPress)
         
         do {
-            try albumsFetchedResultsController.performFetch()
+            try albumPinsFetchedResultsController.performFetch()
         } catch {}
         
-        albumsFetchedResultsController.delegate = self
+        albumPinsFetchedResultsController.delegate = self
                 
         loadMap()
     }
@@ -86,27 +86,32 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
 
         mapView.removeAnnotations(mapView.annotations)
         
-        let albums = albumsFetchedResultsController.fetchedObjects as? [FlickrAlbum]
-        for album in albums! {
-            
-            let annotationCoordinate = CLLocationCoordinate2DMake(Double(album.latitude), Double(album.longitude))
-            let dropPin = MKPointAnnotation()
-            dropPin.coordinate = annotationCoordinate
-            mapView.addAnnotation(dropPin)
-        }
+        let albumPins = albumPinsFetchedResultsController.fetchedObjects
         
-        let mapData = mapSettingsHelper.loadCoordinatesAndZoomLevel()
-        let latitude = mapData[kCoordinatesLatKey] as? Double
-        let longitude = mapData[kCoordinatesLonKey] as? Double
-        let spanLatitude = mapData[kSpanCoordinatesLatKey] as? Double
-        let spanLongitude = mapData[kSpanCoordinatesLonKey] as? Double
-        if latitude != nil && longitude != nil {
-            let centerCoord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude!, longitude: longitude!)
-            if spanLatitude != nil && spanLongitude != nil {
-                let spanCoord: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: spanLatitude!, longitudeDelta: spanLongitude!)
-                let region = MKCoordinateRegion(center: centerCoord, span: spanCoord)
-                mapView.setRegion(region, animated: true)
+        if albumPins != nil && albumPins?.count > 0 {
+        
+            for pin in albumPins! {
                 
+                let pinData = pin as! FlickrAlbumPin
+                let annotationCoordinate = CLLocationCoordinate2DMake(Double(pinData.latitude), Double(pinData.longitude))
+                let dropPin = MKPointAnnotation()
+                dropPin.coordinate = annotationCoordinate
+                mapView.addAnnotation(dropPin)
+            }
+            
+            let mapData = mapSettingsHelper.loadCoordinatesAndZoomLevel()
+            let latitude = mapData[kCoordinatesLatKey] as? Double
+            let longitude = mapData[kCoordinatesLonKey] as? Double
+            let spanLatitude = mapData[kSpanCoordinatesLatKey] as? Double
+            let spanLongitude = mapData[kSpanCoordinatesLonKey] as? Double
+            if latitude != nil && longitude != nil {
+                let centerCoord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude!, longitude: longitude!)
+                if spanLatitude != nil && spanLongitude != nil {
+                    let spanCoord: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: spanLatitude!, longitudeDelta: spanLongitude!)
+                    let region = MKCoordinateRegion(center: centerCoord, span: spanCoord)
+                    mapView.setRegion(region, animated: true)
+                    
+                }
             }
         }
         
@@ -164,92 +169,28 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
     }
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        
-        let albumName = String(format: "%.6fN%.6f", view.annotation!.coordinate.latitude, view.annotation!.coordinate.longitude)
-        
+                
         if isEdit == false {
             
-            showLoading()
-            
-            flickrAgent.getPhotosFromLocation(view.annotation!.coordinate.latitude, longtitude: view.annotation!.coordinate.longitude, completionHandler: { (result, error) in
-                
-                if result != nil {
-                    
-                    let currPhotoAlbum = FlickrAlbum(dictionary: ["latitude": view.annotation!.coordinate.latitude, "longitude": view.annotation!.coordinate.longitude, "name": albumName], context: self.sharedContext)
-                    
-                    if let photos = result![FlickrClient.JSONResponseKeys.Photos]![FlickrClient.JSONResponseKeys.Photo] as? NSArray {
-                        
-                        for photo in photos {
-                            let currPhoto = photo as? [String : AnyObject]
-                            let _ = currPhoto.map() { (dictionary: [String : AnyObject]) -> FlickrImage in
-                                let currPhotoItem = FlickrImage(dictionary: dictionary, context: self.sharedContext)
-                                
-                                currPhotoItem.album = currPhotoAlbum
-                                
-                                return currPhotoItem
-                            }
-                        }
-                        
-                        // Save the context
-                        self.saveContext()
-                        
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.stopLoading()
-                        })
-                        
-                        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
-                        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-                        fetchRequest.predicate = NSPredicate(format: "name = %@", albumName)
-                        
-                        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-                            managedObjectContext: self.sharedContext,
-                            sectionNameKeyPath: nil,
-                            cacheName: nil)
-                        do {
-                            try fetchedResultsController.performFetch()
-                        } catch {}
-                        
-                        
-                        let results = fetchedResultsController.fetchedObjects
-                        if results != nil && results?.count > 0 {
-                            let album = results![0] as! FlickrAlbum
-                            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("VTAlbumCollectionViewController") as! VTAlbumCollectionViewController
-                            
-                            vc.images = album.images
-                            vc.centerCoordinate = CLLocationCoordinate2D(latitude: Double(album.latitude), longitude: Double(album.longitude))
-                            dispatch_async(dispatch_get_main_queue(), {
-                                self.navigationController?.pushViewController(vc, animated: true)
-                            })
-                        }
-                        
-                    } else {
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.stopLoading()
-                        })
-                    }
-                    
-                }else{
-                    dispatch_async(dispatch_get_main_queue(), {
-                        self.stopLoading()
-                    })
-                }
-                
-            })
+            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("VTAlbumCollectionViewController") as! VTAlbumCollectionViewController
+            vc.centerCoordinate = CLLocationCoordinate2D(latitude: Double(view.annotation!.coordinate.latitude), longitude: Double(view.annotation!.coordinate.longitude))
+                self.navigationController?.pushViewController(vc, animated: true)
         
         }else{
             
             do {
-                try albumsFetchedResultsController.performFetch()
+                try albumPinsFetchedResultsController.performFetch()
             } catch {}
             
-            
-            let results = albumsFetchedResultsController.fetchedObjects
-            let album = results![0] as! FlickrAlbum
-            sharedContext.deleteObject(album)
+            let fetchRequest = NSFetchRequest(entityName: "FlickrAlbumPin")
+            let name = String(format: "%.6fN%.6f", (view.annotation?.coordinate.latitude)!, (view.annotation?.coordinate.longitude)!)
+            fetchRequest.predicate = NSPredicate(format: "name = %@", name)
+            let albumPin = albumPinsFetchedResultsController.fetchedObjects?.first as! FlickrAlbumPin
+            sharedContext.deleteObject(albumPin)
             CoreDataStackManager.sharedInstance().saveContext()
             
             do {
-                try albumsFetchedResultsController.performFetch()
+                try albumPinsFetchedResultsController.performFetch()
             } catch {}
             
             loadMap()
@@ -279,6 +220,15 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
             }
             
             
+            let dictionary: [String : AnyObject] = [
+                FlickrAlbumPin.Keys.Latitude : mkView.annotation!.coordinate.latitude,
+                FlickrAlbumPin.Keys.Longitude : mkView.annotation!.coordinate.longitude
+            ]
+            
+            _ = FlickrAlbumPin(dictionary: dictionary, context: sharedContext)
+        
+            self.saveContext()
+            
             let endFrame:CGRect = mkView.frame;
             
             // Move annotation out of view
@@ -303,29 +253,6 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         }
     }
     
-    func reverseGeocode(latitude: Double, longitude: Double) -> String {
-        
-        let location = CLLocation(latitude: latitude, longitude: longitude)
-        
-        let geoCoder = CLGeocoder()
-        let _: AnyObject
-        let _: NSError
-        var albumNameByLocation = ""
-        geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemark, error) -> Void in
-            if error != nil {
-                print("Error: \(error!.localizedDescription)")
-                return
-            }
-            if placemark!.count > 0 {
-                let pm = placemark![0] as CLPlacemark
-                albumNameByLocation = "\(pm.name!)-\(pm.postalCode!)"
-            } else {
-                print("Error with data")
-                return
-            }
-        })
-        return albumNameByLocation
-    }
     
     func addAnnotation(gestureRecognizer:UIGestureRecognizer){
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
@@ -351,19 +278,17 @@ class VTMapTableViewController: UITableViewController, UIGestureRecognizerDelega
         activityView?.removeFromSuperview()
     }
     
-    lazy var albumsFetchedResultsController: NSFetchedResultsController = {
+    lazy var albumPinsFetchedResultsController: NSFetchedResultsController = {
         
-        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
+        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbumPin")
         
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-                                                                  managedObjectContext: self.sharedContext,
-                                                                  sectionNameKeyPath: nil,
-                                                                  cacheName: nil)
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         
         return fetchedResultsController
         
     }()
+    
 
 }

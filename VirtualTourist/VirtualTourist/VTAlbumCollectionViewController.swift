@@ -8,19 +8,92 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 private let reuseIdentifier = "VTMapCollectionViewCell"
 
-class VTAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class VTAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, NSFetchedResultsControllerDelegate {
+    
+    let kHeightOfButton: CGFloat = 66.0
     
     var centerCoordinate: CLLocationCoordinate2D?
-    var images: [FlickrImage]?
+    var images = [FlickrImage]()
     var addToList = [FlickrImage]()
+    
+    var overlay: UIView?
+    var activityView: UIActivityIndicatorView?
+    
+    var newCollectionBtn: UIButton?
+    var deleteBtn: UIButton?
+    
+    let flickrAgent = FlickrClient.sharedInstance()
+    
+    // MARK: - Core Data Convenience
+    
+    lazy var sharedContext: NSManagedObjectContext =  {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
+    
+    func saveContext() {
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    lazy var albumsFetchedResultsController: NSFetchedResultsController = {
+        
+        let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
+        
+        let albumName = String(format: "%.6fN%.6f", self.centerCoordinate!.latitude, self.centerCoordinate!.longitude)
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "name = %@", albumName)
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        return fetchedResultsController
+        
+    }()
     
     override func viewDidLoad() {
         let backBarBtn = UIBarButtonItem(title: "Ok", style: .Plain, target: self, action: #selector(VTAlbumCollectionViewController.onBack))
+        
         self.navigationItem.hidesBackButton = true
         self.navigationItem.leftBarButtonItem = backBarBtn
+        
+        overlay = UIView(frame: view.frame)
+        overlay!.backgroundColor = UIColor.blackColor()
+        overlay!.alpha = 0.3
+        
+        activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
+        activityView!.center = view.center
+        
+        newCollectionBtn = UIButton(frame: CGRectMake(0, UIScreen.mainScreen().bounds.size.height-kHeightOfButton, UIScreen.mainScreen().bounds.size.width, kHeightOfButton))
+        newCollectionBtn?.setTitle("New Collection", forState: .Normal)
+        newCollectionBtn?.backgroundColor = UIColor.lightGrayColor()
+        newCollectionBtn?.addTarget(self, action: #selector(VTAlbumCollectionViewController.onNew), forControlEvents: .TouchUpInside)
+        view.addSubview(newCollectionBtn!)
+        
+        deleteBtn = UIButton(frame: CGRectMake(0, UIScreen.mainScreen().bounds.size.height-kHeightOfButton, UIScreen.mainScreen().bounds.size.width, kHeightOfButton))
+        deleteBtn?.setTitle("Remove Selected Pictures", forState: .Normal)
+        deleteBtn?.backgroundColor = UIColor.lightGrayColor()
+        deleteBtn?.addTarget(self, action: #selector(VTAlbumCollectionViewController.onDelete), forControlEvents: .TouchUpInside)
+        deleteBtn?.hidden = true
+        view.addSubview(deleteBtn!)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        loadPhotos()
+    }
+    
+    func onNew() {
+        loadPhotosFromFlickr()
+    }
+    
+    func onDelete() {
+        for image in addToList {
+            self.sharedContext.deleteObject(image)
+        }
+        loadPhotos()
     }
     
     func onBack() {
@@ -38,25 +111,32 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSizeMake(110, 110)
+        return CGSizeMake(115, 115)
     }
     
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        addToList.append(images![indexPath.row])
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! VTMapCollectionViewCell
-        if !cell.isChosen {
-            cell.layer.borderWidth = 8.0
-            cell.layer.borderColor = UIColor.grayColor().CGColor
-            cell.isChosen = true
+        let currItem = images[indexPath.row]
+        if currItem.selected == 0 {
+            addToList.append(images[indexPath.row])
+            if addToList.count == 0 {
+                deleteBtn?.hidden = true
+            }else{
+                deleteBtn?.hidden = false
+            }
+            currItem.selected = 1
+            self.saveContext()
         }else{
-            let imageObj = images![indexPath.row]
+            let imageObj = images[indexPath.row]
             let idxOfObj = addToList.indexOf(imageObj)
             addToList.removeAtIndex(idxOfObj!)
-            let cell = collectionView.cellForItemAtIndexPath(indexPath) as! VTMapCollectionViewCell
-            cell.layer.borderWidth = 0.0
-            cell.layer.borderColor = UIColor.clearColor().CGColor
-            cell.isChosen = false
+            if addToList.count == 0 {
+                deleteBtn?.hidden = true
+            }else{
+                deleteBtn?.hidden = false
+            }
+            currItem.selected = 0
         }
+        collectionView.reloadData()
     }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
@@ -64,27 +144,24 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         
         if kind == UICollectionElementKindSectionHeader {
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "VTCollectionHeaderView", forIndexPath: indexPath) as! VTCollectionHeaderView
+            
+            headerView.mapView.removeAnnotations(headerView.mapView.annotations)
                         
             let latitude = centerCoordinate?.latitude
             let longitude = centerCoordinate?.longitude
             if latitude != nil && longitude != nil {
                 let centerCoord: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: latitude!, longitude: longitude!)
-                let latDelta:CLLocationDegrees = 0.01
-                let longDelta:CLLocationDegrees = 0.01
-                let theSpan:MKCoordinateSpan = MKCoordinateSpanMake(latDelta, longDelta)
-                let region = MKCoordinateRegion(center: centerCoord, span: theSpan)
-                headerView.mapView.setRegion(region, animated: false)
+                let region = MKCoordinateRegionMakeWithDistance(centerCoord, 500, 500)
+                let adjustedRegion = headerView.mapView.regionThatFits(region)
+                headerView.mapView.setRegion(adjustedRegion, animated: false)
+                headerView.mapView.userInteractionEnabled = false
                 let annotation = MKPointAnnotation()
                 annotation.coordinate = centerCoord
                 headerView.mapView.addAnnotation(annotation)
             }
             
             reusableview = headerView
-        }else if kind == UICollectionElementKindSectionFooter {
-            let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionFooter, withReuseIdentifier: "VTCollectionFooterView", forIndexPath: indexPath) as! VTCollectionFooterView
-            reusableview = headerView
         }
-        
         
         return reusableview
     }
@@ -97,7 +174,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
 
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images!.count
+        return images.count
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -105,7 +182,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     
         var photoImage = UIImage(named: "sampleno")
         
-        var currImg = images![indexPath.row]
+        let currImg = images[indexPath.row]
         
         cell?.imgView!.image = nil
         
@@ -116,6 +193,8 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         }
             
         else {
+            
+            cell?.activityIndicator?.startAnimating()
             
             // Start the task that will eventually download the image
             let task = FlickrClient.sharedInstance().taskForImageWithSize(currImg.imagePath!) { data, error in
@@ -135,6 +214,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         cell?.imgView!.image = image
+                        cell?.activityIndicator?.stopAnimating()
                     }
                 }
             }
@@ -144,6 +224,14 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         }
         
         cell?.imgView!.image = photoImage
+        
+        if currImg.selected == 1 {
+            cell!.layer.borderWidth = 8.0
+            cell!.layer.borderColor = UIColor.grayColor().CGColor
+        }else{
+            cell!.layer.borderWidth = 0.0
+            cell!.layer.borderColor = UIColor.clearColor().CGColor
+        }
     
         return cell!
     }
@@ -205,6 +293,170 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                     
             })
         }
+    }
+    
+    func loadPhotos() {
+        
+        do {
+            try albumsFetchedResultsController.performFetch()
+        } catch {}
+        
+        albumsFetchedResultsController.delegate = self
+        
+        if albumsFetchedResultsController.fetchedObjects?.count == 0 {
+        
+            loadPhotosFromFlickr()
+            
+        }else{
+            
+            let results = albumsFetchedResultsController.fetchedObjects
+            if results != nil && results?.count > 0 {
+                let album = results![0] as! FlickrAlbum
+                self.images = getRandomObjectsFromFetchedResults(album)
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.collectionView?.reloadData()
+                })
+            }
+            
+        }
+        
+    }
+    
+    func getRandomObjectsFromFetchedResults(album :FlickrAlbum) -> [FlickrImage] {
+        
+        let results = album.images
+        let tempArray = NSMutableArray()
+        var remaining = 0
+        var max = 0
+        if results.count >= 21 {
+            remaining = 21
+            max = 21
+        }else{
+            remaining = results.count
+            max = results.count
+        }
+        
+        if results.count < remaining {return results}
+        let nums = generateRandomNumbers(remaining, max: max)
+        while remaining > 1 {
+            let randomNum = nums[remaining]
+            tempArray.addObject(results[randomNum])
+            remaining-=1
+        }
+        
+        var resultArray = [FlickrImage]()
+        for obj in tempArray {
+            resultArray.append(obj as! FlickrImage)
+        }
+        
+        return resultArray
+    }
+    
+    func generateRandomNumbers(count: Int, max: Int) -> [Int] {
+        
+        // create an array of 0 through 10
+        var nums = Array(0...max)
+        
+        var randoms = [Int]()
+        for _ in 0...count {
+            let index = Int(arc4random_uniform(UInt32(nums.count)))
+            randoms.append(nums[index])
+            nums.removeAtIndex(index)
+        }
+        
+        return randoms
+    }
+    
+    func loadPhotosFromFlickr() {
+        
+        showLoading()
+        
+        flickrAgent.getPhotosFromLocation(centerCoordinate!.latitude, longtitude: centerCoordinate!.longitude, completionHandler: { (result, error) in
+            
+            if result != nil {
+                
+                let albumName = String(format: "%.6fN%.6f", self.centerCoordinate!.latitude, self.centerCoordinate!.longitude)
+                
+                let currPhotoAlbum = FlickrAlbum(dictionary: ["latitude": self.centerCoordinate!.latitude, "longitude": self.centerCoordinate!.longitude, "name": albumName], context: self.sharedContext)
+                
+                if let photos = result![FlickrClient.JSONResponseKeys.Photos]![FlickrClient.JSONResponseKeys.Photo] as? NSArray {
+                    
+                    for photo in photos {
+                        let currPhoto = photo as? [String : AnyObject]
+                        let _ = currPhoto.map() { (dictionary: [String : AnyObject]) -> FlickrImage in
+                            let currPhotoItem = FlickrImage(dictionary: dictionary, context: self.sharedContext)
+                            
+                            currPhotoItem.album = currPhotoAlbum
+                            
+                            return currPhotoItem
+                        }
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.stopLoading()
+                    })
+                    
+                    let fetchRequest = NSFetchRequest(entityName: "FlickrAlbum")
+                    fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+                    fetchRequest.predicate = NSPredicate(format: "name = %@", albumName)
+                    
+                    let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+                        managedObjectContext: self.sharedContext,
+                        sectionNameKeyPath: nil,
+                        cacheName: nil)
+                    do {
+                        try fetchedResultsController.performFetch()
+                    } catch {}
+                    
+                    
+                    let results = fetchedResultsController.fetchedObjects
+                    if results != nil && results?.count > 0 {
+                        let album = results![0] as! FlickrAlbum
+                        self.images = self.getRandomObjectsFromFetchedResults(album)
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.stopLoading()
+                            self.collectionView?.reloadData()
+                        })
+                    }
+                    
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.stopLoading()
+                        let alert = UIAlertView()
+                        alert.title = "Error"
+                        alert.message = "Request Timeout"
+                        alert.addButtonWithTitle("Ok")
+                        alert.show()
+                    })
+                }
+                
+            }else{
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.stopLoading()
+                    let alert = UIAlertView()
+                    alert.title = "Error"
+                    alert.message = "Request Timeout"
+                    alert.addButtonWithTitle("Ok")
+                    alert.show()
+                })
+            }
+            
+        })
+        
+    }
+    
+    // MARK: Loading View
+    
+    func showLoading() {
+        view.addSubview(overlay!)
+        view.addSubview(activityView!)
+        activityView?.startAnimating()
+    }
+    
+    func stopLoading() {
+        activityView?.stopAnimating()
+        overlay?.removeFromSuperview()
+        activityView?.removeFromSuperview()
     }
 
 }

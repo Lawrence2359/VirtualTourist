@@ -6,16 +6,24 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="images" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="FlickrImage" inverseName="album" inverseEntity="FlickrImage" syncable="YES"/>
     </entity>
+    <entity name="FlickrAlbumPin" representedClassName=".FlickrAlbumPin" syncable="YES">
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="FlickrImage" representedClassName=".FlickrImage" syncable="YES">
         <attribute name="farm" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="filePath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imagePath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="photoID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="secret" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="selected" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="server" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlickrAlbum" inverseName="images" inverseEntity="FlickrAlbum" syncable="YES"/>
     </entity>
     <elements>
         <element name="FlickrAlbum" positionX="-36" positionY="9" width="128" height="105"/>
-        <element name="FlickrImage" positionX="-54" positionY="-9" width="128" height="135"/>
+        <element name="FlickrImage" positionX="-54" positionY="-9" width="128" height="165"/>
+        <element name="FlickrAlbumPin" positionX="-45" positionY="63" width="128" height="90"/>
     </elements>
 </model>
