@@ -14,6 +14,8 @@ private let reuseIdentifier = "VTMapCollectionViewCell"
 
 class VTAlbumCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, NSFetchedResultsControllerDelegate {
     
+    var emptyLabel: UILabel?
+    
     let kHeightOfButton: CGFloat = 66.0
     var albumName: String?
     
@@ -56,6 +58,14 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         
         activityView = UIActivityIndicatorView(activityIndicatorStyle: .White)
         activityView!.center = view.center
+        
+        emptyLabel = UILabel(frame: CGRectMake(0,0, UIScreen.mainScreen().bounds.size.width, 44))
+        emptyLabel?.textAlignment = .Center
+        emptyLabel?.center = view.center
+        emptyLabel?.text = "No photos found :("
+        emptyLabel?.textColor = UIColor.blackColor()
+        emptyLabel?.hidden = true
+        view.addSubview(emptyLabel!)
         
         newCollectionBtn = UIButton(frame: CGRectMake(0, UIScreen.mainScreen().bounds.size.height-kHeightOfButton, UIScreen.mainScreen().bounds.size.width, kHeightOfButton))
         newCollectionBtn?.setTitle("New Collection", forState: .Normal)
@@ -101,6 +111,9 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     }
     
     func onNew() {
+        for image in images {
+            self.sharedContext.deleteObject(image)
+        }
         loadPhotosFromFlickr()
     }
     
@@ -119,6 +132,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         album = getAlbum()
         images = (album?.images)!
         loadPhotos()
+        deleteBtn?.hidden = true
     }
     
     func onBack() {
@@ -233,8 +247,10 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                     // Craete the image
                     let image = UIImage(data: data)
                     
+                    self.sharedContext.performBlockAndWait({
                     // update the model, so that the infrmation gets cashed
-                    currImg.photoImage = image
+                        currImg.photoImage = image
+                    })
                     
                     // update the cell later, on the main thread
                     
@@ -329,7 +345,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             
         }else{
             
-            self.images = getRandomObjectsFromFetchedResults()
+            self.images = (album?.images)!
             dispatch_async(dispatch_get_main_queue(), {
                 self.collectionView?.reloadData()
             })
@@ -338,50 +354,6 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         
     }
     
-    func getRandomObjectsFromFetchedResults() -> [FlickrImage] {
-        
-        let results = album!.images
-        let tempArray = NSMutableArray()
-        var remaining = 0
-        var max = 0
-        if results.count >= 21 {
-            remaining = 21
-            max = 21
-        }else{
-            remaining = results.count
-            max = results.count - 1
-        }
-        
-        if results.count < remaining {return results}
-        let nums = generateRandomNumbers(remaining, max: max)
-        while remaining > 1 {
-            let randomNum = nums[remaining]
-            tempArray.addObject(results[randomNum])
-            remaining-=1
-        }
-        
-        var resultArray = [FlickrImage]()
-        for obj in tempArray {
-            resultArray.append(obj as! FlickrImage)
-        }
-        
-        return resultArray
-    }
-    
-    func generateRandomNumbers(count: Int, max: Int) -> [Int] {
-        
-        // create an array of 0 through 10
-        var nums = Array(0...max)
-        
-        var randoms = [Int]()
-        for _ in 0...count {
-            let index = Int(arc4random_uniform(UInt32(nums.count)))
-            randoms.append(nums[index])
-            nums.removeAtIndex(index)
-        }
-        
-        return randoms
-    }
     
     func loadPhotosFromFlickr() {
         
@@ -393,25 +365,35 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
                 
                 if let photos = result![FlickrClient.JSONResponseKeys.Photos]![FlickrClient.JSONResponseKeys.Photo] as? NSArray {
                     
-                    for photo in photos {
-                        let currPhoto = photo as? [String : AnyObject]
-                        let _ = currPhoto.map() { (dictionary: [String : AnyObject]) -> FlickrImage in
-                            let currPhotoItem = FlickrImage(dictionary: dictionary, context: self.sharedContext)
-                            
-                            currPhotoItem.album = self.album
-                            
-                            return currPhotoItem
-                        }
+                    if photos.count == 0 {
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.emptyLabel?.hidden = false
+                        })
+                    }else{
+                        dispatch_async(dispatch_get_main_queue(), {
+                            self.emptyLabel?.hidden = true
+                        })
                     }
                     
-                    dispatch_async(dispatch_get_main_queue(), {
-                        self.stopLoading()
+                    self.sharedContext.performBlockAndWait({
+                        
+                        for photo in photos {
+                            let currPhoto = photo as? [String : AnyObject]
+                            let _ = currPhoto.map() { (dictionary: [String : AnyObject]) -> FlickrImage in
+                                let currPhotoItem = FlickrImage(dictionary: dictionary, context: self.sharedContext)
+                                
+                                currPhotoItem.album = self.album
+                                
+                                return currPhotoItem
+                            }
+                        }
+                        
+                        self.saveContext()
                     })
                     
-                    
-                    self.images = self.getRandomObjectsFromFetchedResults()
                     dispatch_async(dispatch_get_main_queue(), {
                         self.stopLoading()
+                        self.images = self.album!.images
                         self.collectionView?.reloadData()
                     })
                     
