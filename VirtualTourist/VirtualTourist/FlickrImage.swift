@@ -55,7 +55,9 @@ class FlickrImage : NSManagedObject {
         )
         let URLToMyFile = documentsURL.URLByAppendingPathComponent(filePath)
         let filemgr = NSFileManager.defaultManager()
-        try! filemgr.removeItemAtPath(URLToMyFile.path!)
+        if let path = URLToMyFile.path {
+            let _ = try? filemgr.removeItemAtPath(path)
+        }
     }
 
     func flickrImageURL(size:String = "m") -> String {

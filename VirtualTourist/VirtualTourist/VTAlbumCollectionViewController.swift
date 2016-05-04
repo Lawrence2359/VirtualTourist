@@ -110,6 +110,14 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
         loadPhotos()
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        for image in images {
+            image.selected = 0
+        }
+        self.saveContext()
+    }
+    
     func onNew() {
         for image in images {
             self.sharedContext.deleteObject(image)
@@ -168,7 +176,7 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
             currItem.selected = 0
         }
         self.saveContext()
-        collectionView.reloadData()
+        collectionView.reloadItemsAtIndexPaths([indexPath])
     }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
