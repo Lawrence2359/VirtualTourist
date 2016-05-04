@@ -106,6 +106,14 @@ class VTAlbumCollectionViewController: UICollectionViewController, UICollectionV
     
     func onDelete() {
         for image in addToList {
+            let documentsURL = NSURL(
+                fileURLWithPath: NSSearchPathForDirectoriesInDomains(
+                    .DocumentDirectory, .UserDomainMask, true).first!,
+                isDirectory: true
+            )
+            let URLToMyFile = documentsURL.URLByAppendingPathComponent(image.filePath)
+            let filemgr = NSFileManager.defaultManager()
+            try! filemgr.removeItemAtPath(URLToMyFile.path!)
             self.sharedContext.deleteObject(image)
         }
         album = getAlbum()
