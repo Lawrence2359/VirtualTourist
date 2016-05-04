@@ -46,6 +46,17 @@ class FlickrImage : NSManagedObject {
         filePath = filePathURL()
         selected = 0
     }
+    
+    override func prepareForDeletion() {
+        let documentsURL = NSURL(
+            fileURLWithPath: NSSearchPathForDirectoriesInDomains(
+                .DocumentDirectory, .UserDomainMask, true).first!,
+            isDirectory: true
+        )
+        let URLToMyFile = documentsURL.URLByAppendingPathComponent(filePath)
+        let filemgr = NSFileManager.defaultManager()
+        try! filemgr.removeItemAtPath(URLToMyFile.path!)
+    }
 
     func flickrImageURL(size:String = "m") -> String {
         return "http://farm\(farm!).staticflickr.com/\(server!)/\(photoID!)_\(secret!)_m.jpg"
